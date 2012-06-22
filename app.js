@@ -1,4 +1,4 @@
-var http = require('http'), url = require('url'), sys = require('util'), fs = require('fs'), file = require('path'), init = require('./lib/controllers');
+var http = require('http'), url = require('url'), sys = require('util'), fs = require('fs'), file = require('path'), init = require('./lib/controllers'), database = require('./lib/database');
 
 // view options
 var view = {
@@ -72,17 +72,19 @@ var server = http.createServer(function(request, response){
 		// start routing
 		if(prts.last() == ''){
 			// if empty then index.
-			getView('index', request, response, c_data);		
+			getView('index', request, response, c_data);	
 		}else{
 			// if the page exists render, else 404
 			file.exists('views/' + prts.last() + '.html', function(exists){
 				if(exists){
-					getView(prts.last(), request, response, c_data);			
+					getView(prts.last(), request, response, c_data);	
 				}else{
 					getError(404, request, response);
 				}
 			});
 		}
+		
+		sys.puts(sys.inspect(database.build()));
 	}else{
 		// end the response if its a favicon
 		response.end();
@@ -110,6 +112,13 @@ console.log('HTTP Server started.');
  	
  	// run our controllers
  	controller.build(c_data);
+ 	
+ 	// get model
+ 	getModel(controller);	
+ }
+ 
+ function getModel(controller){
+ 	
  }
  
  function getError(type, req, res){
